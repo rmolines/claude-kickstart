@@ -1,0 +1,25 @@
+# markdownlint configuration
+# See: https://github.com/DavidAnson/markdownlint/blob/main/doc/Rules.md
+
+default: true
+
+# Allow inline HTML (useful for details/summary, badges)
+MD033: false
+
+# Allow duplicate headings (common in HANDOVER.md entries)
+MD024: false
+
+# Allow long lines (URLs, tables)
+MD013:
+  line_length: 200
+  tables: false
+  code_blocks: false
+
+# Allow trailing punctuation in headings (e.g., "TODO:")
+MD026: false
+
+# Allow bare URLs in some contexts
+MD034: false
+
+# Allow first heading to not be h1 (useful in templates)
+MD041: false
