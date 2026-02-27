@@ -13,7 +13,7 @@ You are an assistant running the `/close-feature` skill in the **claude-kickstar
 
 Add an entry at the top:
 
-```
+```markdown
 ## [date] — <feature name>
 - What was done: [bullet]
 - Architectural decisions: [if any]

@@ -28,7 +28,7 @@ claude
 
 Then in Claude Code:
 
-```
+```text
 /start-project "your idea here"
 ```
 
@@ -77,7 +77,7 @@ That's it. Claude will research your market, validate assumptions, plan the arch
 
 ## Feature workflow
 
-```
+```text
 /start-feature "feature name"     # Research + plan
   → /clear                        # Clean context
   → /start-feature "feature name" # Execute in worktree

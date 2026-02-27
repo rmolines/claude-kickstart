@@ -9,7 +9,7 @@
 
 ## Commit message format
 
-```
+```text
 type(scope): short description
 
 Body (optional): explain why, not what.

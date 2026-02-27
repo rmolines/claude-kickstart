@@ -23,3 +23,12 @@ MD034: false
 
 # Allow first heading to not be h1 (useful in templates)
 MD041: false
+
+# Allow table column style variation (cosmetic, too noisy for templates)
+MD060: false
+
+# Allow fenced code blocks without blank lines (too noisy inside list items)
+MD031: false
+
+# Allow lists without surrounding blank lines (too noisy in dense docs)
+MD032: false
