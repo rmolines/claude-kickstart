@@ -16,11 +16,16 @@ Primeiro, verifique os argumentos:
 - Se o argumento for `--fast <nome>` → pular Fase A e B, ir direto para **Fase C**
 - Se houver nome → usá-lo diretamente
 - **Se não houver nome:**
-  1. Procure um `roadmap.md` em `.claude/feature-plans/*/roadmap.md`
-  2. Se encontrar, leia e identifique o primeiro item `- [ ]` no M1 (ou no milestone mais próximo) que ainda não tem worktree criada (`git branch -a | grep feature/`)
-  3. Derive o slug kebab-case do texto do item e apresente:
+  1. Verifique se existe algum `sprint.md` em `.claude/feature-plans/*/<milestone>/sprint.md`
+     (gerado pelo `/start-milestone` — contém features decompostas e priorizadas)
+     - Se existir: leia e identifique o primeiro item `- [ ]` que ainda não tem worktree
+       criada (`git branch -a | grep feature/`)
+  2. Se não houver `sprint.md`, procure `roadmap.md` em `.claude/feature-plans/*/roadmap.md`
+     - Se encontrar: leia e identifique o primeiro item `- [ ]` no M1 (ou milestone mais próximo)
+       que ainda não tem worktree criada
+  3. Derive o slug kebab-case do texto do item encontrado e apresente:
      ```
-     Nenhuma feature especificada. Encontrei no roadmap.md:
+     Nenhuma feature especificada. Encontrei no <sprint.md|roadmap.md>:
 
      Próxima feature: "<texto do item>"
      Slug sugerido: <slug-kebab-case>
@@ -28,7 +33,7 @@ Primeiro, verifique os argumentos:
      Confirma? (ou informe outro nome)
      ```
   4. Aguarde confirmação antes de continuar
-  5. Se não houver `roadmap.md`, pergunte o nome curto da feature (kebab-case)
+  5. Se não houver nem `sprint.md` nem `roadmap.md`, pergunte o nome curto da feature (kebab-case)
 
 Depois verifique a existência dos arquivos em `.claude/feature-plans/<nome>/`:
 
@@ -239,7 +244,7 @@ Lançar validação em background com Task tool (`run_in_background=true`):
 Enquanto aguarda: exibir resumo do que foi feito (arquivos criados/editados, decisões tomadas).
 
 Quando o agente terminar:
-- ✅: confirmar e lembrar de rodar `/ship-feature`
+- ✅: confirmar e sugerir rodar `/validate` para verificar alinhamento com o plan.md antes de `/ship-feature`
 - ❌: exibir erro completo e aguardar orientação
 
 ---
