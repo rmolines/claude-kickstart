@@ -13,6 +13,7 @@ O argumento passado é o nome ou descrição da feature: $ARGUMENTS
 ## Detecção de fase
 
 Primeiro, verifique os argumentos:
+- Se o argumento for `--discover <nome>` ou `--discover` (sem nome) → ir para **Fase 0** (Discovery)
 - Se o argumento for `--fast <nome>` → pular Fase A e B, ir direto para **Fase C**
 - Se houver nome → usá-lo diretamente
 - **Se não houver nome:**
@@ -37,11 +38,134 @@ Primeiro, verifique os argumentos:
 
 Depois verifique a existência dos arquivos em `.claude/feature-plans/<nome>/`:
 
-| Arquivos presentes | Fase |
+| Condição | Fase |
 |---|---|
-| Nenhum | Fase A — Pesquisa |
+| `--discover` flag E `discovery.md` ausente | Fase 0 — Discovery |
+| `discovery.md` existe, `research.md` não | Fase A — Pesquisa (com contexto do discovery) |
 | `research.md` existe, `plan.md` não | Fase B — Planejamento |
 | `plan.md` existe | Fase C — Execução |
+
+---
+
+## FASE 0 — Discovery
+
+> Executada apenas quando `--discover` é passado e `discovery.md` ainda não existe.
+> Objetivo: definir o problema real, escopo e critério de sucesso antes de pesquisa técnica.
+
+### Passo 0.1 — Pesquisa paralela (3 subagentes)
+
+Se o nome não foi informado junto com `--discover`, perguntar o nome curto da feature (kebab-case) antes de lançar os subagentes.
+
+Lance os 3 subagentes simultaneamente com Task tool (`run_in_background=true`).
+
+**Subagente A — Codebase:**
+> Leia o CLAUDE.md do projeto para entender a estrutura, stack e convenções.
+> Leia os hot files listados no CLAUDE.md + o arquivo de configuração central.
+> Identifique o módulo mais próximo ao problema descrito em: `<feature descrita>`.
+> Retorne: o que já existe no projeto que resolve parcialmente o problema, quais são os pontos
+> de extensão naturais, e dependências internas relevantes.
+
+**Subagente B — Web:**
+> Pesquise como produtos similares resolvem o problema de `<feature descrita>`.
+> Foco: padrões de UX estabelecidos, alternativas conhecidas, trade-offs documentados em 2025-2026.
+> Retorne: 2-3 abordagens comuns com prós e contras de cada uma.
+
+**Subagente C — Tech estimate:**
+> Com base na descrição `<feature descrita>` e no stack do projeto (leia CLAUDE.md para identificar),
+> estime: complexidade aproximada (P, M, G), riscos técnicos principais, dependências não óbvias,
+> e decisões que criam dívida técnica se feitas errado agora.
+
+Aguardar os subagentes com `TaskOutput`. Sintetizar os resultados antes de continuar.
+
+### Passo 0.2 — Síntese inicial
+
+Apresentar ao usuário:
+- Entendimento atual do problema com base nos subagentes
+- 2-3 suposições mais arriscadas identificadas (o que pode estar errado neste entendimento)
+
+Formato:
+```
+## Entendimento atual
+
+<síntese do que foi encontrado nos 3 subagentes>
+
+## Suposições que podem estar erradas
+
+1. <suposição A>
+2. <suposição B>
+3. <suposição C — se houver>
+```
+
+### Passo 0.3 — Rodada Problema
+
+Apresentar hipótese sobre o problema real. Fazer **no máximo 3 perguntas cirúrgicas** focadas em:
+- O que já existe no codebase / produto que toca isso
+- O que está faltando exatamente
+- Para quem: usuário/persona afetada
+
+Aguardar resposta antes de continuar.
+
+### Passo 0.4 — Rodada Alternativas
+
+Com base nas respostas anteriores, apresentar o que já existe (no produto + externamente) que resolve parcialmente, e por que não basta. Fazer **no máximo 3 perguntas** sobre:
+- Tentativas anteriores que não funcionaram
+- Restrições que eliminam certas abordagens
+- Preferências sobre trade-offs (ex: simplicidade vs. flexibilidade)
+
+Aguardar resposta antes de continuar.
+
+### Passo 0.5 — Rodada Escopo e Critério de Sucesso
+
+Propor o que está dentro/fora do escopo e como medir "done". Fazer **no máximo 3 perguntas** para validar:
+- Limites explícitos do escopo
+- Critério de sucesso mensurável ou comportamento observável
+- Prazo ou dependências externas que afetam o escopo
+
+Aguardar resposta antes de continuar.
+
+### Passo 0.6 — Gerar discovery.md
+
+Salvar em `.claude/feature-plans/<nome>/discovery.md`:
+
+```markdown
+# Discovery: <nome>
+_Gerado em: <data>_
+
+## Problema real
+[descrição precisa — não a solução]
+
+## Usuário / contexto
+[quem sente a dor, em qual situação]
+
+## Alternativas consideradas
+| Opção | Por que não basta |
+|---|---|
+| | |
+
+## Por que agora
+[motivação: o que muda se não fizer]
+
+## Escopo da feature
+### Dentro
+- [item]
+
+### Fora (explícito)
+- [item — tão importante quanto o dentro]
+
+## Critério de sucesso
+- [métrica ou comportamento observável]
+
+## Riscos identificados
+[da pesquisa dos subagentes — Passo 0.1]
+```
+
+Ao final:
+```
+discovery.md salvo em .claude/feature-plans/<nome>/
+
+Próximo passo: Fase A (Pesquisa técnica)
+Recomendo /clear antes de continuar — rode /start-feature <nome> novamente.
+```
 
 ---
 
@@ -49,7 +173,10 @@ Depois verifique a existência dos arquivos em `.claude/feature-plans/<nome>/`:
 
 ### Passo A.1 — Coletar contexto
 
-Perguntar ao usuário (se não veio nos argumentos):
+**Se `discovery.md` existir** em `.claude/feature-plans/<nome>/`: lê-lo integralmente antes de perguntar ao usuário.
+As seções "Problema real", "Escopo da feature" e "Critério de sucesso" do discovery já respondem as perguntas padrão — suprimí-las se já estiverem respondidas.
+
+Se `discovery.md` não existir ou as informações abaixo não estiverem cobertas, perguntar ao usuário:
 - O que a feature faz?
 - Alguma restrição técnica conhecida?
 
@@ -61,6 +188,7 @@ Lance os 3 subagentes simultaneamente com Task tool (`run_in_background=true`).
 > Leia o CLAUDE.md do projeto para entender a estrutura, stack e convenções.
 > Depois leia os hot files listados no CLAUDE.md + o CI workflow principal + o arquivo de configuração central do projeto.
 > Também leia o módulo ou arquivo mais próximo da feature descrita.
+> **Se existir `.claude/feature-plans/<nome>/discovery.md`: leia-o e use as seções "Problema real" e "Escopo da feature" para focar a pesquisa de codebase nos arquivos mais relevantes.**
 > Retorne: lista de arquivos relevantes para a feature, padrões do projeto a seguir,
 > dependências externas que podem ser necessárias, armadilhas documentadas no CLAUDE.md que se aplicam ao escopo.
 
