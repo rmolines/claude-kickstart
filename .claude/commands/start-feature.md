@@ -158,7 +158,37 @@ Se houver learnings relevantes: incorporar ajustes e adicionar seção `## Learn
 
 ### Passo B.5 — Salvar plano e perguntar ao usuário
 
-Salvar em `.claude/feature-plans/<nome>/plan.md`.
+Salvar em `.claude/feature-plans/<nome>/plan.md` com a estrutura:
+
+```markdown
+# Plan: <nome>
+
+## Problema
+<Descrição do problema original — copiar de research.md seção "Descrição da feature".
+Este campo é usado pelo /validate para verificar alinhamento durante a implementação.>
+
+## Arquivos a modificar
+- `path/to/file` — <o que fazer exatamente>
+
+## Passos de execução
+1. <Passo 1 — especificar arquivo exato, função, o que criar/editar>
+2. <Passo 2 — idem>
+...
+
+## Checklist de infraestrutura
+- [ ] Novo Secret: <não / qual>
+- [ ] Script de setup: <não / o que faz>
+- [ ] Dockerfile / imagem: <não muda / o que muda>
+- [ ] Config principal do projeto: <não muda / o que muda>
+- [ ] CI/CD: <não muda / o que muda>
+- [ ] Novas dependências: <não / quais>
+
+## Rollback
+<Como reverter se falhar — comandos concretos>
+
+## Learnings aplicados
+<Lista dos learnings relevantes que impactam o plano — ou "nenhum impacto identificado">
+```
 
 Exibir e aguardar resposta:
 ```
