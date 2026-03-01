@@ -1,66 +1,264 @@
 # /start-feature
 
-You are an assistant running the `/start-feature` skill in the **claude-kickstart** project.
+Você é um assistente de desenvolvimento executando o skill `/start-feature`.
 
-## Phase detection
+Este skill implementa um workflow de features em 3 fases com context hygiene entre elas.
+Cada fase salva seus outputs em arquivos para que a próxima fase possa lê-los sem depender
+da memória conversacional.
 
-| File present | Phase |
+O argumento passado é o nome ou descrição da feature: $ARGUMENTS
+
+---
+
+## Detecção de fase
+
+Primeiro, verifique os argumentos:
+- Se o argumento for `--fast <nome>` → pular Fase A e B, ir direto para **Fase C**
+- Se houver nome → usá-lo diretamente
+- **Se não houver nome:**
+  1. Procure um `roadmap.md` em `.claude/feature-plans/*/roadmap.md`
+  2. Se encontrar, leia e identifique o primeiro item `- [ ]` no M1 (ou no milestone mais próximo) que ainda não tem worktree criada (`git branch -a | grep feature/`)
+  3. Derive o slug kebab-case do texto do item e apresente:
+     ```
+     Nenhuma feature especificada. Encontrei no roadmap.md:
+
+     Próxima feature: "<texto do item>"
+     Slug sugerido: <slug-kebab-case>
+
+     Confirma? (ou informe outro nome)
+     ```
+  4. Aguarde confirmação antes de continuar
+  5. Se não houver `roadmap.md`, pergunte o nome curto da feature (kebab-case)
+
+Depois verifique a existência dos arquivos em `.claude/feature-plans/<nome>/`:
+
+| Arquivos presentes | Fase |
 |---|---|
-| None | Phase A — Intake + Research |
-| `research.md` | Phase B — Plan |
-| `plan.md` | Phase C — Worktree + Execution |
+| Nenhum | Fase A — Pesquisa |
+| `research.md` existe, `plan.md` não | Fase B — Planejamento |
+| `plan.md` existe | Fase C — Execução |
 
-Check `.claude/feature-plans/<name>/` for existing files to determine current phase.
+---
 
-## Project context
+## FASE A — Pesquisa
 
-**Hot files** — read before planning any feature:
+### Passo A.1 — Coletar contexto
 
-- `CLAUDE.md`
-- `.claude/commands/*.md` (all existing skills — they are the product)
-- `.github/workflows/ci.yml`
-- `README.md`
-- `Makefile`
+Perguntar ao usuário (se não veio nos argumentos):
+- O que a feature faz?
+- Alguma restrição técnica conhecida?
 
-**Branch convention:** `feat/<name-kebab-case>`
-**Worktree path:** `.claude/worktrees/<name>`
+### Passo A.2 — Lançar subagentes em paralelo
 
-**Project-specific pitfalls:**
+Lance os 3 subagentes simultaneamente com Task tool (`run_in_background=true`).
 
-- Skills are the product — changes to `.claude/commands/` affect users who already forked
-- `SYNC_VERSION` must be updated whenever `.claude/commands/` changes (run `git rev-parse HEAD > .claude/commands/SYNC_VERSION`)
-- `bootstrap.yml` and `template-sync.yml` have `!is_template` guards — test in a fork, not the template repo
-- Hooks in `settings.json` point to scripts in `.claude/hooks/` — never inline commands in `settings.json`
-- CI runs `validate-structure.sh` — adding required files to that script means adding them to the repo too
+**Subagente A — Codebase reader:**
+> Leia o CLAUDE.md do projeto para entender a estrutura, stack e convenções.
+> Depois leia os hot files listados no CLAUDE.md + o CI workflow principal + o arquivo de configuração central do projeto.
+> Também leia o módulo ou arquivo mais próximo da feature descrita.
+> Retorne: lista de arquivos relevantes para a feature, padrões do projeto a seguir,
+> dependências externas que podem ser necessárias, armadilhas documentadas no CLAUDE.md que se aplicam ao escopo.
 
-## Phase A — Intake + Research
+**Subagente B — Conflict checker:**
+> Verifique se `.claude/agent-memory/coordinator/MEMORY.md` existe.
+> Se existir: leia integralmente e identifique (1) hot files com claim ativo na seção 'Hot file claims (ativo)',
+> (2) worktrees que tocam arquivos sobrepostos com a feature descrita,
+> (3) ordem de merge recomendada se houver conflito.
+> Se não existir: retorne "Sem coordenador ativo — sem conflitos a reportar".
 
-1. Read the hot files listed above
-2. Use WebSearch if the feature involves:
-   - External APIs (GitHub, Claude Code CLI features)
-   - GitHub Actions changes (verify action versions)
-   - Claude Code CLI skill/hook patterns
-3. Save findings to `.claude/feature-plans/<name>/research.md`
-4. Run `/clear` before Phase B
+**Subagente C — Web researcher** (somente se a feature usa libs/APIs externas):
+> Pesquise boas práticas atuais para `<tecnologia/API relevante>`.
+> Foco: padrões de integração em 2025-2026, armadilhas conhecidas, versões estáveis recomendadas.
 
-## Phase B — Plan
+Aguardar os subagentes com `TaskOutput`. Sintetizar os resultados.
 
-1. Read `research.md`
-2. Design the plan with impact on each hot file
-3. Save to `.claude/feature-plans/<name>/plan.md`
-4. Present plan to user for approval
-5. Run `/clear` before Phase C
+### Passo A.3 — Identificar hot files
 
-## Phase C — Worktree + Execution
+Leia o CLAUDE.md do projeto para identificar quais arquivos são considerados "hot"
+(modificados por quase toda feature — CI, configs principais, etc.).
+Se o CLAUDE.md não listar explicitamente, inferir pelos arquivos de CI e configuração presentes no repo.
 
-1. Read `plan.md`
-2. Create the worktree:
+Para cada arquivo que a feature vai tocar, marcar com ⚠️ se for hot file e cruzar com resultado do Subagente B.
 
-   ```bash
-   git worktree add .claude/worktrees/<name> -b feat/<name>
-   cd .claude/worktrees/<name>
-   git fetch origin && git rebase origin/main
-   ```
+### Passo A.4 — Salvar pesquisa
 
-3. Execute the plan in the worktree
-4. When done: run `/ship-feature`
+Criar `.claude/feature-plans/<nome>/research.md`:
+
+```markdown
+# Research: <nome>
+
+## Descrição da feature
+<o que faz, por que, contexto>
+
+## Arquivos existentes relevantes
+- `path/to/file` — <por que é relevante>
+
+## Padrões identificados
+<convenções do projeto que a feature deve seguir>
+
+## Dependências externas
+<libs, APIs, secrets necessários — ou "nenhuma">
+
+## Hot files que serão tocados
+- `arquivo` — <motivo> [⚠️ CONFLITO POTENCIAL se outro agente já toca]
+
+## Riscos e restrições
+<armadilhas identificadas, limitações, pontos de atenção>
+
+## Fontes consultadas
+<URLs do WebSearch, se usadas>
+```
+
+Ao final:
+```
+research.md salvo em .claude/feature-plans/<nome>/
+
+Próximo passo: Fase B (Planejamento)
+Recomendo /clear antes de continuar — rode /start-feature <nome> novamente.
+```
+
+---
+
+## FASE B — Planejamento
+
+### Passo B.1 — Ler a pesquisa
+
+Ler `.claude/feature-plans/<nome>/research.md` integralmente.
+
+### Passo B.2 — Montar plano de execução
+
+Para cada mudança necessária, especificar:
+- Arquivo exato a criar ou editar
+- O que exatamente fazer (não vago — "adicionar função X que faz Y")
+- Ordem de execução (dependências entre etapas)
+- Como reverter se falhar
+
+### Passo B.3 — Checklist de infraestrutura
+
+Adaptar ao projeto com base no CLAUDE.md:
+- [ ] Precisa de novo secret de ambiente? → listar quais e onde configurar
+- [ ] Muda arquivos de CI/CD? → atenção: hot file, risco de conflito
+- [ ] Muda configuração principal do projeto? → listar impacto
+- [ ] Precisa de script de setup no servidor/infra? → descrever o que deve fazer
+- [ ] Novas dependências? → listar e verificar compatibilidade
+
+### Passo B.4 — Validar contra LEARNINGS.md (se existir)
+
+Se `{{LEARNINGS_PATH}}` existe no projeto: lançar subagente `Explore` que:
+- Lê `{{LEARNINGS_PATH}}` integralmente
+- Recebe o rascunho do plano como contexto
+- Retorna learnings relevantes com impacto direto no plano
+
+Se houver learnings relevantes: incorporar ajustes e adicionar seção `## Learnings aplicados` no plan.md.
+
+### Passo B.5 — Salvar plano e perguntar ao usuário
+
+Salvar em `.claude/feature-plans/<nome>/plan.md`.
+
+Exibir e aguardar resposta:
+```
+plan.md salvo em .claude/feature-plans/<nome>/
+
+Deseja executar agora ou prefere fazer /clear primeiro?
+- Executar agora — contexto atual ainda é válido
+- Fazer /clear — limpa contexto antes de executar (recomendado se a sessão está longa)
+  Depois rode /start-feature <nome> para retomar na Fase C.
+```
+
+- Resposta afirmativa → ir para Fase C
+- Resposta "/clear" ou "depois" → encerrar
+
+---
+
+## FASE C — Execução
+
+### Passo C.1 — Ler o plano
+
+Ler `.claude/feature-plans/<nome>/plan.md` integralmente.
+
+### Passo C.2 — Registrar no coordinator (se existir)
+
+Verificar se `.claude/agent-memory/coordinator/MEMORY.md` existe.
+
+**Se existir:**
+
+```bash
+REPO_ROOT=$(git worktree list | head -1 | awk '{print $1}')
+MEMORY_FILE="$REPO_ROOT/.claude/agent-memory/coordinator/MEMORY.md"
+git -C "$REPO_ROOT" pull --rebase origin main
+```
+
+Verificar hot file claims. Se conflito: alertar o usuário com opções (aguardar / reduzir escopo / prosseguir) e aguardar resposta.
+
+Editar MEMORY_FILE:
+- Adicionar linha em `## Worktrees ativas`: `| <nome> | <branch> | <hot files> | Em progresso | <data> |`
+- Para cada hot file: adicionar em `## Hot file claims (ativo)`: `| <arquivo> | <nome> | <data> |`
+
+```bash
+git -C "$REPO_ROOT" add .claude/agent-memory/coordinator/MEMORY.md
+git -C "$REPO_ROOT" commit -m "chore(coordinator): register worktree <nome> + claim hot files"
+git -C "$REPO_ROOT" push origin main || (git -C "$REPO_ROOT" pull --rebase origin main && git -C "$REPO_ROOT" push origin main)
+```
+
+**Se não existir:** prosseguir sem coordenação.
+
+### Passo C.3 — Criar worktree
+
+Antes de criar, verificar quantas worktrees estão abertas:
+```bash
+git worktree list | tail -n +2 | wc -l
+```
+Se o resultado for **≥ 5**, emitir aviso:
+> ⚠️ Há X worktrees abertas. Worktrees zumbis acumulam e causam conflitos de merge. Considere rodar `/close-feature` nas que já foram mergeadas antes de abrir mais.
+> Deseja abrir mesmo assim?
+- Se o usuário confirmar → prosseguir
+- Se não → encerrar
+
+Usar `EnterWorktree name=<nome>`.
+
+### Passo C.4 — Executar o plano
+
+**IMPORTANTE:** Não exibir o plano completo e aguardar aprovação — o plano foi aprovado na Fase B.
+Mostrar só um resumo de uma linha e começar o passo 1.
+
+Regras:
+- Executar cada passo completamente antes de passar ao próximo
+- Ler o estado atual de cada arquivo antes de editar — nunca editar às cegas
+- Confirmar cada passo com "✅ Passo N concluído" e continuar sem parar
+- Se um passo falhar: diagnosticar, tentar corrigir; só parar se não conseguir após 2 tentativas
+- **Se há outros agentes ativos no repo: fazer push imediatamente após cada commit — nunca deixar commits locais pendentes (outro agente pode fazer `git reset --hard` e apagar o trabalho)**
+- **Não pedir confirmação entre passos — executar do início ao fim de forma autônoma**
+
+### Passo C.5 — Validação ao concluir
+
+Lançar validação em background com Task tool (`run_in_background=true`):
+- Se o CLAUDE.md tiver comando de build configurado → rodar
+- Se o CLAUDE.md tiver comando de teste configurado → rodar
+- Reportar ✅ ou ❌ com output
+
+Enquanto aguarda: exibir resumo do que foi feito (arquivos criados/editados, decisões tomadas).
+
+Quando o agente terminar:
+- ✅: confirmar e lembrar de rodar `/ship-feature`
+- ❌: exibir erro completo e aguardar orientação
+
+---
+
+## Modo rápido — `--fast`
+
+Para features simples (1-3 arquivos, escopo claro, sem pesquisa necessária):
+1. Perguntar o que a feature faz e quais arquivos serão tocados
+2. Criar `plan.md` mínimo diretamente (sem `research.md`, sem subagente de validação)
+3. Ir imediatamente para Fase C
+
+Usar apenas quando: feature pequena, sem risco de conflito, sem dependências externas novas.
+
+---
+
+## Regras gerais
+
+- Nunca pular fases sem `--fast`
+- Nunca criar worktree nas Fases A ou B — worktree só na Fase C
+- Se o nome não foi informado, perguntar antes de qualquer leitura de arquivo
+- **Na Fase C: não parar entre passos pedindo confirmação — executar autonomamente**
+- **MEMORY.md coordinator vai sempre para main via commit imediato — nunca deixar pendente**
