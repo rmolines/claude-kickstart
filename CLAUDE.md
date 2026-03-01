@@ -15,10 +15,12 @@
 
 Use the skills below for any non-trivial feature (>2-3 files or with architectural decisions):
 
-1. `/start-feature` — intake + research (Phase A) → `/clear` → planning (Phase B) → `/clear` → worktree + execution (Phase C)
-2. Build and iterate in the worktree
-3. `/ship-feature` — commit + rebase + PR + CI + smoke test
-4. `/close-feature` — documentation (HANDOVER, MEMORY, LEARNINGS, CLAUDE.md) + cleanup
+1. `/start-milestone` — decompose milestone from roadmap.md into scoped features → generates `sprint.md`
+2. `/start-feature` — intake + research (Phase A) → `/clear` → planning (Phase B) → `/clear` → worktree + execution (Phase C)
+3. Build and iterate in the worktree
+4. `/validate` — direction check: verify implementation still solves the original problem
+5. `/ship-feature` — commit + rebase + PR + CI + smoke test
+6. `/close-feature` — documentation (HANDOVER, MEMORY, LEARNINGS, CLAUDE.md) + cleanup
 
 **Why the `/clear` between phases?**
 Clean context = less hallucination. Each phase saves output to `.claude/feature-plans/<name>/`
@@ -47,7 +49,7 @@ These files are modified by almost every feature — coordinate with other agent
 ## Worktree convention
 
 - Path: `.claude/worktrees/<feature-name>`
-- Branch: `feat/<feature-name>` (kebab-case)
+- Branch: `feature/<feature-name>` (kebab-case)
 - Always rebase before starting: `git fetch origin && git rebase origin/main`
 
 ## Daily commands
