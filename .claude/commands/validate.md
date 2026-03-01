@@ -18,9 +18,9 @@ essa responsabilidade é do /ship-feature. -->
 - Senão, inferir do branch atual:
   ```bash
   git branch --show-current
-  # Resultado esperado: "claude/<nome>" → nome = parte após "claude/"
+  # Resultado esperado: "feature/<nome>" → nome = parte após "feature/"
   ```
-- Se o branch não seguir o padrão `claude/<nome>`, pedir ao usuário que especifique:
+- Se o branch não seguir o padrão `feature/<nome>`, pedir ao usuário que especifique:
   > "Não consegui inferir o nome da feature. Qual o nome? (ex: minha-feature)"
 
 **2. Verificar existência do `plan.md`:**
