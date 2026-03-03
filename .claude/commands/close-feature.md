@@ -166,6 +166,56 @@ fi
 
 Substituir `<nome>` pelo slug da feature e `<pr_number>` pelo PR detectado no Passo 0.5 (ou `""` se não encontrado).
 
+#### 1g. Propagação ao kickstart (se houver skills novos/modificados)
+
+Verificar se algum arquivo em `.claude/commands/` foi criado ou modificado nesta feature:
+
+```bash
+git diff origin/main...HEAD --name-only | grep "^\.claude/commands/"
+```
+
+Se **nenhum skill foi tocado**: pular sem mensagem.
+
+Se **há skills novos ou modificados**, avaliar cada um:
+
+**Você** decide se o skill tem lógica genérica o suficiente para outros projetos — não pergunte ao usuário.
+Critério: o skill resolve um problema que qualquer projeto com esse workflow teria, e a lógica
+pode ser expressa com `{{PLACEHOLDERS}}` sem perder utilidade.
+
+Exemplos que **devem** propagar: skills de revisão, checkpoints de qualidade, workflows de design.
+Exemplos que **não devem**: skills com paths, comandos ou contexto exclusivos deste projeto.
+
+Para cada skill candidato, apresentar:
+
+```text
+📤 "<nome>" foi criado/modificado nesta feature.
+   Lógica parece genérica o suficiente para o kickstart.
+   Confirmar propagação? (sim = crio versão template e faço PR no kickstart; não = fica só aqui)
+```
+
+Com confirmação, criar a versão template:
+
+1. Ler o skill atual e identificar elementos projeto-específicos
+2. Substituir por `{{PLACEHOLDER}}` — ex: paths hardcoded, nomes de ferramentas, constraints específicas
+3. Adicionar seções `## Quando NÃO usar` e `## Testes` se ausentes (padrão kickstart)
+4. Escrever em `/Users/rmolines/git/claude-kickstart/.claude/commands/<nome>.md`
+5. Fazer commit e PR no kickstart:
+
+```bash
+KICKSTART=/Users/rmolines/git/claude-kickstart
+git -C "$KICKSTART" add .claude/commands/<nome>.md
+git -C "$KICKSTART" commit -m "feat(skills): add /<nome> — propagated from <projeto>"
+# Usar gh api diretamente (gh pr create pode detectar repo errado em worktrees):
+BRANCH=$(git -C "$KICKSTART" branch --show-current)
+git -C "$KICKSTART" push origin "$BRANCH"
+gh api repos/rmolines/claude-kickstart/pulls \
+  --method POST \
+  -f title="feat(skills): add /<nome>" \
+  -f head="$BRANCH" \
+  -f base="main" \
+  -f body="Propagado de <projeto> após uso real na feature <nome-feature>."
+```
+
 ### 2. Remover worktree e branch local
 
 ```bash
@@ -210,6 +260,7 @@ Documentação:
 - MEMORY.md coordinator <✅ ou ⏭️ sem coordinator>
 - LEARNINGS.md <✅ ou ⏭️ pulado>
 - CLAUDE.md armadilhas <✅ ou ⏭️ pulado>
+- Kickstart propagation <✅ PR aberto | ⏭️ sem skills candidatos | ⏭️ não confirmado pelo dev>
 
 Worktree: <removida | já não existia | aguardando saída manual>
 feature-plans: arquivado
