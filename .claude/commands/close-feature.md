@@ -97,7 +97,7 @@ Gerar entrada no `CHANGELOG.md` (raiz do repo). Criar o arquivo se não existir.
 ---
 ```
 
-**Inserir:** logo após a linha `# Changelog` (antes da primeira entrada `## `).
+**Inserir:** logo após a linha `# Changelog` (antes da primeira entrada `##`).
 Usar Edit tool com `old_string` = primeira linha após o cabeçalho e `new_string` = nova entrada + essa mesma linha.
 
 #### 1c. MEMORY.md coordinator — commit direto em main (se existir)
@@ -216,6 +216,16 @@ gh api repos/rmolines/claude-kickstart/pulls \
   -f body="Propagado de <projeto> após uso real na feature <nome-feature>."
 ```
 
+Exibir URL do PR e aguardar confirmação de merge antes de continuar.
+
+Após merge confirmado, sincronizar a versão genérica de volta ao projeto:
+
+```bash
+make sync-skills
+```
+
+Se `make sync-skills` não existir: avisar e sugerir verificar o Makefile.
+
 ### 2. Remover worktree e branch local
 
 ```bash
@@ -251,7 +261,7 @@ git -C "$REPO_ROOT" worktree list | grep "<nome>"
 
 ### 4. Resumo final
 
-```
+```text
 ✅ Feature encerrada!
 
 Documentação:
