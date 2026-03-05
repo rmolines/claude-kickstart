@@ -63,7 +63,7 @@ Lance os 3 subagentes simultaneamente com Task tool (`run_in_background=true`).
 **Subagente B — Web / First-principles:**
 
 Se `--novel` está ativo **ou** se o web search anterior não encontrou precedentes relevantes:
-> Você é um raciocínador de primeira ordem. NÃO faça web search por produtos similares.
+> Você é um raciocinádor de primeira ordem. NÃO faça web search por produtos similares.
 > Execute este chain of thought para `<feature descrita>`:
 >
 > **Etapa 1 — Desconstrução em primitivos**
@@ -214,7 +214,7 @@ Lance os 3 subagentes simultaneamente com Task tool (`run_in_background=true`).
 **Subagente C — Web researcher / First-principles** (somente se a feature usa libs/APIs externas ou `--novel` está ativo):
 
 Se `--novel` está ativo:
-> Você é um raciocínador de primeira ordem. Execute o chain of thought abaixo para `<feature descrita>`.
+> Você é um raciocinádor de primeira ordem. Execute o chain of thought abaixo para `<feature descrita>`.
 > Foco: arquitetura técnica — não UX/produto. Parta dos primitivos do stack (leia CLAUDE.md).
 >
 > **Etapa 1 — Primitivos técnicos**
@@ -531,14 +531,31 @@ Não sugerir `/ship-feature` antes dessa confirmação.
 
 ---
 
+## Quando usar sem roadmap
+
+Se você está em um projeto existente e quer adicionar uma feature específica,
+não precisa ter roadmap.md ou sprint.md. Rode diretamente:
+
+```text
+/start-feature <nome>
+```
+
+O skill detecta ausência de plan.md, faz 1-2 perguntas rápidas, gera um mini plan.md
+e executa. Tudo na mesma sessão, sem /clear.
+
+Use o fluxo completo (`--deep` ou `--discover`) quando houver incerteza técnica
+ou o problema ainda não estiver bem definido.
+
+---
+
 ## Flags — referência rápida
 
-| Flag | Comportamento | Quando usar |
+| Flag | Comportamento | Caso de uso típico |
 |---|---|---|
-| (nenhuma) | Fase C fast — execução direta | Feature clara, 1-3 arquivos, sem pesquisa |
+| (nenhuma) | Fase C fast — execução direta com mini plan | Feature clara em projeto existente, sem roadmap necessário |
 | `--deep` | Fase A → B → C — workflow completo | Feature complexa, múltiplos arquivos, incerteza técnica |
 | `--discover` | Fase 0 — pitch, para antes da worktree | Ainda explorando o problema, sem bet |
-| `--novel` | Ativa first-principles reasoning em vez de web search por analogias | Feature inédita, sem precedentes — combinar com `--discover` ou `--deep` |
+| `--novel` | First-principles em vez de web search | Feature inédita, sem precedentes |
 | `--fast` | Alias de (nenhuma) — depreciado | Substituído pelo default |
 
 ---
