@@ -133,10 +133,21 @@ Exibir também na conversa.
 
 ---
 
+## Diferença entre /validate e /checkpoint
+
+| | /checkpoint | /validate |
+|---|---|---|
+| Quando | Durante execução, entre deliverables | Após execução, antes do PR |
+| O que verifica | Assunções do plan.md foram validadas? | Código implementado = problema do plan.md? |
+| Gate | Obrigatório (definido no plan.md) | Recomendado (soft gate no /ship-feature) |
+| Escopo | Deliverable atual | Feature inteira (diff vs origin/main) |
+
+---
+
 ## Testes
 
 | Cenário | Input | Output esperado |
-|---------|-------|-----------------|
+|---------|-------|----------------|
 | Feature alinhada | `/validate` em worktree com plan.md e código alinhado | Relatório com ✅ nas duas seções, veredito "Alinhado" |
 | Feature com drift | `/validate` em worktree onde código divergiu do problema | ⚠️ Drift identificado com arquivo/função específica |
 | Cobertura parcial | `/validate` com metade do plano implementada | 🔄 Parcial em vários itens, recomendação "Continuar" |
