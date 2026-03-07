@@ -3,7 +3,7 @@
 Mapa completo das skills, quando usar cada uma, e como se relacionam.
 
 > Contratos invariantes entre skills: ver `~/.claude/rules/skill-contracts.md`.
-> Princípio central: o usuário é o gate — nenhuma skill lê artefatos de outra automaticamente.
+> Princípio central: skills leem o `## Handoff` section do artefato anterior por path convention; gate humano é relocado para revisão do bloco antes do `/clear`.
 
 ---
 
