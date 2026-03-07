@@ -38,6 +38,12 @@ This was documented in CVE-2025-59536. Mitigation: keep hook logic in external s
 
 ---
 
+## markdownlint versão local vs CI
+
+Local usa `markdownlint-cli2 v0.21` (via npx), CI usa `v0.6` via `DavidAnson/markdownlint-cli2-action`.
+A v0.6 é mais estrita em `MD013` para linhas longas em prosa — uma linha verde local não garante CI verde.
+Ao editar arquivos `.md` longos, verificar se a versão da action no `.github/workflows/ci.yml` coincide com a local antes de assumir que o CI vai passar.
+
 ## markdownlint
 
 - Use `npx --yes markdownlint-cli2` to avoid requiring global install
