@@ -172,6 +172,26 @@ _Gerado em: <data>_
 
 ## Riscos identificados
 [da pesquisa dos subagentes — Passo 0.1]
+
+## Handoff
+
+next_skill: /start-feature --deep <nome>
+
+carry_forward:
+- [problema real]: <uma frase — minimal sufficient statistic do problema>
+- [escopo dentro]: <itens principais que estão no escopo>
+- [escopo fora]: <exclusões explícitas>
+- [critério de sucesso]: <comportamento observável>
+- [decisões já tomadas]: <o que não precisa ser re-pesquisado na próxima fase>
+
+excluded:
+- [alternativas descartadas e por quê — previne re-descoberta]
+
+invalidated:
+- [o que ficaria stale se task_definition mudar substancialmente]
+
+gate: não
+<!-- gate: sim = pre-bet decision permanece humano; não = próxima skill lê ## Handoff automaticamente por path convention -->
 ````
 
 Ao final:
@@ -198,7 +218,9 @@ Próximo comando: /start-feature --deep <nome>
 
 ### Passo A.1 — Coletar contexto
 
-Se `discovery.md` existir: lê-lo integralmente. As seções "Problema real", "Escopo" e "Critério de sucesso" suprimem as perguntas padrão.
+Se `discovery.md` existir: ler o `## Handoff` section.
+Se `## Handoff` não existir: ler o arquivo inteiro e emitir `⚠️ discovery.md sem Handoff block — lendo artefato completo`.
+Os campos `carry_forward` do Handoff block suprimem as perguntas padrão.
 
 Se não existir ou faltar contexto:
 - O que a feature faz?
@@ -282,6 +304,22 @@ Criar `.claude/feature-plans/<nome>/research.md`:
 
 ## Fontes consultadas
 <URLs do WebSearch, se usadas>
+
+## Handoff
+
+next_skill: /start-feature <nome>
+
+carry_forward:
+- [arquitetura decidida]: <abordagem escolhida e por quê>
+- [hot files]: <arquivos que serão tocados>
+- [constraints técnicos]: <o que é irredutível — não pode mudar>
+- [decisão arquitetural principal]: <a escolha mais importante desta fase>
+
+excluded:
+- [abordagens técnicas pesquisadas mas descartadas — previne re-pesquisa]
+
+invalidated:
+- [o que ficaria stale se o escopo ou stack mudar]
 ````
 
 Ao final:
