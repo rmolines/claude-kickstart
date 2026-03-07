@@ -3,7 +3,7 @@
 Mapa completo das skills, quando usar cada uma, e como se relacionam.
 
 > Contratos invariantes entre skills: ver `~/.claude/rules/skill-contracts.md`.
-> Princípio central: o usuário é o gate — nenhuma skill lê artefatos de outra automaticamente.
+> Princípio central: skills leem o `## Handoff` section do artefato anterior por path convention; gate humano é relocado para revisão do bloco antes do `/clear`.
 
 ---
 
@@ -65,7 +65,7 @@ AD-HOC (feature sem roadmap)
 ## Estado = backlog.json + git + sprint.md
 
 | Pergunta | Como descobrir |
-|----------|---------------|
+|----------:|---------------|
 | O que foi entregue? | `backlog.json` features com `status=done` · ou `gh pr list --state merged` |
 | O que está em andamento? | `backlog.json` features com `status=in-progress` · ou `git branch -a \| grep feature/` |
 | O que está planejado? | `backlog.json` features com `status=pending` · ou checkboxes `- [ ]` nos `sprint.md` |
