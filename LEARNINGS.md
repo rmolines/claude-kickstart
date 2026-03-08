@@ -66,3 +66,13 @@ O comando `/cost` dentro do Claude Code mostra o custo acumulado da sessão corr
 
 Em features de skill/protocolo, rodar subagentes de review em paralelo (reuse, qualidade, eficiência) capturou 9 issues
 que não apareceram em testes manuais. Padrão especialmente eficaz para skills com múltiplos modos de execução.
+
+## 2026-03-08 — Guards de seção em skills com múltiplas fontes de dados
+
+Skills que geram output estruturado com seções dependentes de arquivos específicos precisam de guards por seção, não apenas de uma nota geral. Exemplo: "Se LEARNINGS.md existir: listar X. Se não existir: omitir esta seção — não estimar." Uma nota genérica "nunca inventar dados" no final da skill não é suficiente enforcement — o modelo segue o template e preenche o que não tem.
+
+Corolário para dispatch tables de audiência: separar "argumento explícito passado na invocação" de "valor obtido via pergunta ao usuário" no mesmo bloco cria ambiguidade sobre o modo default. O dispatch deve documentar explicitamente qual fonte tem precedência e o que acontece quando nenhuma das duas está disponível.
+
+## 2026-03-08 — Fallback paths precisam de return arc explícito
+
+Se uma skill tem um desvio de fluxo (Fase 1 → Fase 3 quando dados insuficientes), o caminho de volta precisa ser escrito explicitamente: "após Fase 3, retornar para Fase 2 antes de gerar". Sem isso, o modelo pode gerar o output sem ter completado o passo anterior que motivou o desvio.

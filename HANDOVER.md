@@ -4,6 +4,27 @@ Newest entries at the top.
 
 ---
 
+## 2026-03-08 — claude-code-sales-pitch
+
+**O que foi feito:** Criada a skill `/sales-pitch` que lê os arquivos do projeto (CLAUDE.md, backlog.json, LEARNINGS.md, memory/MEMORY.md, README.md) e gera um pitch customizado por audiência (business/tech/cto). Fallback interativo com ≤ 3 perguntas se arquivos estiverem ausentes. Output apenas na conversa.
+
+**Decisões tomadas:**
+- Output conversacional apenas (sem escrita em disco) — alinhado com project-compass como referência
+- Dispatch table explícita para audiências antes de qualquer lógica (CLAUDE.md pitfall: cascade conditionals)
+- Fallback unificado: duas condições (3+ arquivos ausentes; CLAUDE.md com TODO intacto) avaliadas juntas
+- Retorno explícito a Fase 2 após Fase 3 para garantir que audiência seja detectada mesmo no fallback
+
+**Armadilhas encontradas:**
+- Fase 3 inicialmente sem return arc para Fase 2 — pitch seria gerado sem audiência confirmada
+- Dispatch table tinha `ou vazio (após perguntar)` implicando default para Modo A, mas Fase 2 não tem default
+- Seção "Onde estamos" (Modo B) sem guard para backlog.json ausente — vetor de alucinação
+
+**Próximos passos:** Nenhum imediato. Possível v2: suporte a audiência `investors` com framing de produto/SaaS.
+
+**Arquivos-chave:** `.claude/commands/sales-pitch.md`
+
+---
+
 ## pitadas-de-opus — 2026-03-08
 
 **O que foi feito:** Criada a skill `/pitadas-de-opus` — protocolo de calibração deliberada para uso intencional do Opus.

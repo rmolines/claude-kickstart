@@ -49,6 +49,7 @@ These files are modified by almost every feature — coordinate with other agent
 | SYNC_VERSION | SHA must match upstream main HEAD | Update with `git rev-parse upstream/main` after sync |
 | Skills (multi-mode) | Cascade conditionals ("if no --log → mode X") capture unrelated flags (e.g. `--session` falls into mode X branch) | Define an explicit dispatch table at the top of the skill: match each flag combination to exactly one mode before any logic runs |
 | Skill log files (.md) | YAML frontmatter looks structured and parseable, but Claude Code has no frontmatter parser — the file is plain Markdown | Use Markdown headings (`## Session YYYY-MM-DD`) as the accumulation format; frontmatter is write-only from the skill's perspective |
+| Skills (output templates) | Sections that cite a specific file (e.g., `backlog.json`, `LEARNINGS.md`) without an inline guard cause the model to hallucinate content when the file doesn't exist — a trailing note is not enforced per-section | Guard inline at each section: "If file X exists: use it. If not: omit this section entirely." |
 
 ## Worktree convention
 
