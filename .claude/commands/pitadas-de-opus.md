@@ -13,7 +13,7 @@ Protocolo de calibração deliberada para uso pontual e intencional do Opus em u
 
 **O que não é:** Não é routing automático. Não é comparação side-by-side de outputs. Não é "second opinion". A agência de decidir permanece humana — a skill estrutura a decisão, não a substitui.
 
-**Argumento:** `$ARGUMENTS` — pode ser vazio (avaliação de ativação), descrição da tarefa, ou `--log` (registro de delta pós-sessão)
+**Argumento:** `$ARGUMENTS` — pode ser vazio (avaliação de ativação), descrição da tarefa, `--session` (estrutura sessão Opus diretamente), ou `--log` (registro de delta pós-sessão)
 
 ---
 
@@ -96,9 +96,9 @@ Próximo passo: [/pitadas-de-opus --session ou continuar com Sonnet]
 
 ---
 
-## Modo 2 — Estrutura de sessão Opus
+## Modo 2 — Estrutura de sessão Opus (`--session`)
 
-Executado após o usuário confirmar uso do Opus (via Modo 1 ou diretamente). Objetivo: maximizar o
+Executado quando: (a) o usuário confirma uso do Opus no Modo 1, ou (b) `/pitadas-de-opus --session` é invocado diretamente. Objetivo: maximizar o
 aproveitamento da sessão Opus estruturando-a para explorar caminhos que Sonnet não teria tomado.
 
 ### Passo 2.1 — Identificar o domínio
