@@ -13,10 +13,10 @@ Parsear `$ARGUMENTS`:
 
 | Argumento | Modo |
 |-----------|------|
-| `business` ou vazio (após perguntar) | Modo A — Stakeholder de negócio |
+| `business` | Modo A — Stakeholder de negócio |
 | `tech` | Modo B — Dev / Tech lead |
 | `cto` | Modo C — CTO / VP Eng |
-| qualquer outro valor | Perguntar ao usuário |
+| vazio ou qualquer outro valor | Perguntar ao usuário (Fase 2) |
 
 ---
 
@@ -40,10 +40,13 @@ Extrair de cada arquivo:
 - **memory/MEMORY.md** → core value prop, decisões arquiteturais, distribuição
 - **README.md** → linguagem de marketing pronta, quickstart, filosofia
 
-**Checar se os arquivos têm conteúdo real:**
-Se CLAUDE.md existir mas a seção "Project overview" tiver apenas `<!-- TODO: ... -->`, considerar o projeto como "ainda sem descrição personalizada".
+**Verificar se há dados suficientes para gerar o pitch:**
 
-Se 3 ou mais arquivos estiverem ausentes ou sem conteúdo real → ir para **Fase 3 (Fallback)** antes da geração.
+Usar fallback (Fase 3) se qualquer uma das condições abaixo for verdadeira:
+- 3 ou mais arquivos estiverem ausentes ou retornarem apenas `(sem ...)`
+- CLAUDE.md existir mas a seção "Project overview" contiver apenas `<!-- TODO: ... -->`
+
+Se fallback for necessário: executar **Fase 3** primeiro, depois retornar para **Fase 2** (detecção de audiência) e só então gerar o pitch.
 
 ---
 
@@ -182,7 +185,7 @@ Resultado: cada feature vai do problema ao PR com rastreabilidade completa e sem
 
 ### Onde estamos
 
-[Status atual: milestone, features em andamento, próximos passos.]
+[Se backlog.json existir: status atual — milestone, features em andamento, próximos passos. Se não existir e o usuário não forneceu no fallback: omitir esta seção — não estimar.]
 ```
 
 ---
@@ -241,7 +244,7 @@ Resultado: cada feature vai do problema ao PR com rastreabilidade completa e sem
 - **Nunca escrever em arquivo** — o pitch fica na conversa; o usuário copia o que precisar
 - **Nunca inventar dados** — se backlog.json não existe e o usuário não forneceu números, omitir a seção de progresso; não estimar
 - **Jargão trade-off por audiência** — Modo A: zero jargão; Modo B: jargão técnico OK; Modo C: jargão estratégico (governança, rastreabilidade)
-- **CLAUDE.md com TODO intacto** = projeto não personalizado → obrigatoriamente usar fallback interativo
+- **Fallback unificado**: as duas condições (3+ arquivos ausentes; CLAUDE.md com TODO intacto) são avaliadas juntas em Fase 1 — fallback dispara se qualquer uma for verdadeira
 
 ---
 
