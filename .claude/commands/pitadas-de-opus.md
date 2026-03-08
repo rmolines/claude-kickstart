@@ -15,11 +15,19 @@ Protocolo de calibração deliberada para uso pontual e intencional do Opus em u
 
 **Argumento:** `$ARGUMENTS` — pode ser vazio (avaliação de ativação), descrição da tarefa, `--session` (estrutura sessão Opus diretamente), ou `--log` (registro de delta pós-sessão)
 
+**Dispatch:**
+
+| Argumento | Modo executado |
+|---|---|
+| (vazio ou descrição da tarefa) | Modo 1 — Decisão de ativação |
+| `--session` | Modo 2 — Estrutura de sessão Opus |
+| `--log` | Modo 3 — Registro de delta |
+
 ---
 
 ## Modo 1 — Decisão de ativação (default)
 
-Executado quando a skill é invocada sem `--log`.
+Executado quando a skill é invocada sem `--session` e sem `--log`.
 
 ### Passo 1.1 — Entender a tarefa
 
@@ -98,8 +106,12 @@ Próximo passo: [/pitadas-de-opus --session ou continuar com Sonnet]
 
 ## Modo 2 — Estrutura de sessão Opus (`--session`)
 
-Executado quando: (a) o usuário confirma uso do Opus no Modo 1, ou (b) `/pitadas-de-opus --session` é invocado diretamente. Objetivo: maximizar o
-aproveitamento da sessão Opus estruturando-a para explorar caminhos que Sonnet não teria tomado.
+Executado quando: (a) o usuário confirma uso do Opus no Modo 1, ou (b) `/pitadas-de-opus --session` é invocado diretamente.
+
+Se invocado diretamente via `--session` sem contexto anterior: solicitar ao usuário em uma linha:
+"Qual é a tarefa ou decisão que você quer explorar com Opus?" — aguardar resposta antes de continuar para 2.1.
+
+Objetivo: maximizar o aproveitamento da sessão Opus estruturando-a para explorar caminhos que Sonnet não teria tomado.
 
 ### Passo 2.1 — Identificar o domínio
 
@@ -138,9 +150,9 @@ Critério de encerramento: <quando a sessão Opus pode ser considerada completa>
 
 Aguardar confirmação antes de continuar.
 
-### Passo 2.2b — Capturar baseline de custo
+### Passo 2.3 — Capturar baseline de custo
 
-Antes de iniciar a sessão Opus, instruir o usuário:
+Antes de passar o protocolo ao usuário, instruir:
 
 ```text
 Para medir o custo incremental desta sessão Opus, rode agora:
@@ -148,14 +160,14 @@ Para medir o custo incremental desta sessão Opus, rode agora:
   /cost
 
 Anote o valor de "Total cost" atual. Ao final da sessão Opus, rode /cost novamente —
-a diferença é o custo desta pitada de Opus.
+a diferença é o custo desta pitada de Opus. Use /pitadas-de-opus --log para registrar.
 ```
 
-Aguardar confirmação de que o usuário rodou `/cost` antes de continuar.
+Prosseguir diretamente para o Passo 2.4 — não bloquear aguardando confirmação.
 
-### Passo 2.3 — Protocolo de sessão
+### Passo 2.4 — Protocolo de sessão
 
-Após confirmação do escopo, apresentar o protocolo para uso direto com Opus.
+Apresentar o protocolo para uso direto com Opus.
 O protocolo é o mesmo para todos os domínios — o que muda é o contexto injetado.
 
 ```text
@@ -190,7 +202,7 @@ Qual caminho você recomenda e por quê?
 ---
 ```
 
-### Passo 2.4 — Gerar opus-session.md
+### Passo 2.5 — Gerar opus-session.md
 
 Após a sessão Opus ser concluída, salvar o artefato em `.claude/feature-plans/<nome>/opus-session.md`:
 
@@ -217,6 +229,19 @@ _Data: <data> · Domínio: <domínio>_
 
 ## Recomendação
 <caminho recomendado e justificativa>
+
+## Handoff
+
+next_skill: /pitadas-de-opus --log
+
+carry_forward:
+- [tarefa]: <slug ou descrição curta>
+- [dominio]: <domínio identificado>
+- [insight principal]: <o insight mais valioso em uma frase>
+- [recomendação]: <caminho recomendado>
+
+excluded:
+- [caminhos descartados na Etapa 3 — previne re-exploração]
 ```
 
 Ao final: sugerir `/pitadas-de-opus --log` para registrar o delta.
@@ -232,38 +257,37 @@ Executado com `/pitadas-de-opus --log`. Objetivo: converter a sessão Opus em ev
 Fazer **uma** pergunta por vez. Aguardar resposta antes de continuar.
 
 1. "Você rodou `/cost` antes e depois? Se sim, qual foi o custo incremental da sessão Opus? (cole o valor ou 'não medi')"
-2. "O Opus gerou algo que o Sonnet provavelmente não geraria? (sim / não / parcialmente)"
-3. "Se sim: o que especificamente foi diferente? (1-2 frases)"
-4. "Nível de delta percebido: alto (mudou a direção) / médio (refinamento importante) / baixo (confirmou o que já sabia) / nenhum"
+2. "O Opus gerou algo que o Sonnet provavelmente não geraria? Se sim, o que especificamente foi diferente? (1-2 frases. Se não, escreva 'não')"
+3. "Nível de delta percebido: alto (mudou a direção) / médio (refinamento importante) / baixo (confirmou o que já sabia) / nenhum"
 
 ### Passo 3.2 — Appender ao OPUS_LOG.md
 
-Criar ou appender ao `OPUS_LOG.md` na raiz do projeto:
+Criar ou appender ao `OPUS_LOG.md` na raiz do projeto. Cada entrada usa o formato:
 
 ```markdown
----
-data: <data>
-tarefa: <slug ou descrição curta>
-dominio: tech | produto | ux | negocios | marketing | teoria | outro
-contexto: <skill ou momento do projeto — ex: /start-feature --discover, planejamento de roadmap, opcional>
-criterios_ativados: <lista dos critérios ✅ da avaliação>
-custo_sessao: <valor do /cost incremental — ex: "$0.42" ou "não medido">
-delta_percebido: alto | medio | baixo | nenhum
-notas: <1 linha — o que foi diferente, ou por que não houve delta>
----
+## <data> — <slug>
+
+- **Domínio:** tech | produto | ux | negócios | marketing | teoria | outro
+- **Contexto:** <skill ou momento do projeto — ex: /start-feature --discover, planejamento de roadmap>
+- **Critérios ativados:** <lista dos critérios ✅ da avaliação>
+- **Custo da sessão:** <valor do /cost incremental — ex: "$0.42" ou "não medido">
+- **Delta percebido:** alto | médio | baixo | nenhum
+- **Notas:** <1 linha — o que foi diferente, ou por que não houve delta>
 ```
 
-### Passo 3.3 — Exibir padrões acumulados (se ≥ 5 entradas)
+### Passo 3.3 — Exibir resultado
 
-Se `OPUS_LOG.md` tiver 5 ou mais entradas, exibir análise:
+Confirmar que o registro foi adicionado e exibir o total atual de entradas no OPUS_LOG.md.
+
+Se OPUS_LOG.md tiver 5 ou mais entradas, exibir também a análise de padrões:
 
 ```text
 ## Padrões acumulados — pitadas de Opus
 
 Entradas registradas: <N>
 Delta alto ou médio: <X> de <N> (<pct>%)
-Custo total medido: <soma dos custo_sessao com valor — ou "N sessões sem medição">
-Custo médio por sessão Opus: <média — ou "insuficiente">
+Custo total medido: <soma das entradas com valor — ou "N sessões sem medição">
+Custo médio por sessão Opus: <média — ou "insuficiente para calcular">
 
 Domínios com maior taxa de delta alto: <ranking>
 
