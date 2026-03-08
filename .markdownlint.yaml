@@ -3,6 +3,9 @@
 
 default: true
 
+ignores:
+  - ".claude/feature-plans/**"
+
 # Allow inline HTML (useful for details/summary, badges)
 MD033: false
 

@@ -20,7 +20,7 @@ ESTRATÉGICO (uma vez por projeto/milestone)
 
 TÁTICO (por feature)
 ──────────────────────────────────────────
-  /start-feature [--deep] → [implementar] → /validate → /ship-feature → /close-feature
+  /start-feature [--deep] → [implementar] → /validate → /ship-feature (simplify automático) → /close-feature
 
 ORIENTAÇÃO (qualquer momento)
 ──────────────────────────────────────────
