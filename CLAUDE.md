@@ -19,7 +19,7 @@ Use the skills below for any non-trivial feature (>2-3 files or with architectur
 2. `/start-feature` — intake + research (Phase A) → `/clear` → planning (Phase B) → `/clear` → worktree + execution (Phase C)
 3. Build and iterate in the worktree
 4. `/validate` — direction check: verify implementation still solves the original problem
-5. `/ship-feature` — commit + rebase + PR + CI + smoke test
+5. `/ship-feature` — simplify automático + commit + rebase + PR + CI + smoke test
 6. `/close-feature` — documentation (HANDOVER, MEMORY, LEARNINGS, CLAUDE.md) + cleanup
 
 **Orientation (any time):** `/project-compass` — "where are we?", "what's left?", "next feature?"

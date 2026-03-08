@@ -13,7 +13,7 @@ check: lint validate ## Run all checks (lint + validate)
 
 lint: ## Lint all Markdown files
 	@echo "→ Linting Markdown..."
-	@npx --yes markdownlint-cli2 "**/*.md" --config .markdownlint.yaml \
+	@npx --yes markdownlint-cli2 "**/*.md" "!.claude/feature-plans/**" --config .markdownlint.yaml \
 		&& echo "✅ Markdown lint passed" \
 		|| (echo "❌ Markdown lint failed" && exit 1)
 

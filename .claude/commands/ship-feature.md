@@ -68,6 +68,13 @@ Se `.claude/feature-plans/<nome>/validation-report.md` não existir:
 
 Aguardar resposta. Se "continuar": prosseguir normalmente (não é bloqueante).
 
+### 0.4. Simplify automático
+
+Rodar o skill `simplify` agora — sem pedir confirmação ao usuário.
+
+O simplify revisa o diff atual para reuse, qualidade e eficiência, e corrige problemas encontrados diretamente.
+Aguardar a conclusão antes de avançar. Se não houver problemas, continuar normalmente.
+
 ### 0.5. Verificação local (HARD GATE)
 
 Antes de qualquer commit ou push, rodar:
