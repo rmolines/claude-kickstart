@@ -4,6 +4,38 @@ Newest entries at the top.
 
 ---
 
+## pitadas-de-opus — 2026-03-08
+
+**O que foi feito:** Criada a skill `/pitadas-de-opus` — protocolo de calibração deliberada para uso intencional do Opus.
+3 modos: decisão de ativação (4 critérios de assimetria de risco), estrutura de sessão Opus (`--session`),
+e registro acumulável em `OPUS_LOG.md` (`--log`). PR #34 mergeado em 2026-03-08.
+
+**Decisões tomadas:**
+
+- **7 domínios em vez de só tech:** caso de uso real são projetos multi-facetados — expandido para tech, produto, UX,
+  negócios, marketing, teoria, outro; o protocolo adversarial é o mesmo para todos
+- **OPUS_LOG.md na raiz, não em `.claude/`:** o log é um artefato de projeto visível (não infraestrutura interna), então fica junto de LEARNINGS.md e HANDOVER.md
+- **Dispatch table explícita para flags:** `--session` e `--log` são dispatched antes do Modo 1 para evitar ambiguidade de invocação — garante que a skill nunca mistura modos
+- **opus-session.md por sessão em `.claude/feature-plans/<nome>/`:** consistente com a convenção de artefatos das outras skills do projeto
+- **Formato markdown heading em OPUS_LOG.md (não YAML):** legível sem ferramentas, difável, acumulável sem parser especial
+
+**Armadilhas encontradas:**
+
+- **MD041 com frontmatter YAML:** markdownlint exige que o primeiro heading seja `# título` — o heading deve vir logo após o bloco `---`, sem prose intermediária
+- **MD013 em tabelas e prose longa:** tabelas e code blocks são exempt do limite de 200 chars, mas prose de critérios detalhados precisou ser quebrada em listas para não exceder o limite
+
+**Arquivos-chave:**
+
+- `.claude/commands/pitadas-de-opus.md` — skill principal com os 3 modos e dispatch table
+
+**Próximos passos:**
+
+- Calibrar os critérios de ativação do Modo 1 com dados reais do `OPUS_LOG.md` após algumas sessões de uso
+- Considerar um `/project-compass` que leia `OPUS_LOG.md` e mostre padrões de uso (domínios mais ativados, taxa de confirmação de delta)
+- Avaliar se faz sentido adicionar um `--review` mode para comparar o output da sessão Opus com a hipótese inicial registrada no log
+
+---
+
 ## 2026-02-27 — Bootstrap via /start-project
 
 **What was done:**

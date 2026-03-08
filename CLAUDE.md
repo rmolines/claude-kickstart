@@ -47,6 +47,8 @@ These files are modified by almost every feature — coordinate with other agent
 | Hooks | Run in non-interactive shells; `~/.zshrc` with unconditional `echo` breaks JSON | Use `#!/bin/bash` with `set -euo pipefail`; no shell rc sourcing |
 | settings.json | Hooks execute shell without confirmation (CVE-2025-59536) | Comment warns users; hooks in `.claude/hooks/` are auditable |
 | SYNC_VERSION | SHA must match upstream main HEAD | Update with `git rev-parse upstream/main` after sync |
+| Skills (multi-mode) | Cascade conditionals ("if no --log → mode X") capture unrelated flags (e.g. `--session` falls into mode X branch) | Define an explicit dispatch table at the top of the skill: match each flag combination to exactly one mode before any logic runs |
+| Skill log files (.md) | YAML frontmatter looks structured and parseable, but Claude Code has no frontmatter parser — the file is plain Markdown | Use Markdown headings (`## Session YYYY-MM-DD`) as the accumulation format; frontmatter is write-only from the skill's perspective |
 
 ## Worktree convention
 
