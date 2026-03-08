@@ -15,12 +15,14 @@ Conduz um interrogatório socrático onde você responde perguntas concretas e, 
 
 ## Antes de começar
 
-**Avaliação rápida:** Se o usuário já chegou com uma pergunta razoavelmente formada ou um domínio + gap claro, sugira ir direto para `/explore`. A clarificação só agrega quando a ideia ainda não tem forma suficiente para o explore trabalhar.
+**Avaliação rápida:** Se o usuário já chegou com uma pergunta razoavelmente formada ou um domínio + gap claro, sugira ir direto para `/explore`.
+A clarificação só agrega quando a ideia ainda não tem forma suficiente para o explore trabalhar.
 
 Se chegou com algo vago (ou sem nada): prosseguir com os 3 movimentos abaixo.
 
-> **Regra de inibição:** Não ofereça molduras, interpretações, nomes ou sínteses antes de o usuário ter dado pelo menos 3 exemplos ou situações concretas. Reflita de volta o que ouviu na linguagem do usuário — não na sua. Ser "útil" cedo é o principal risco: gera ilusão de clareza enquanto preserva a confusão original.
-
+> **Regra de inibição:** Não ofereça molduras, interpretações, nomes ou sínteses antes de o usuário ter dado pelo menos 3 exemplos ou situações concretas.
+> Reflita de volta o que ouviu na linguagem do usuário — não na sua. Ser "útil" cedo é o principal risco: gera ilusão de clareza enquanto preserva a confusão original.
+>
 > **Ritmo:** Uma pergunta por vez. Aguarde a resposta antes de fazer a próxima. Perguntas empilhadas bloqueiam.
 
 ---
@@ -87,7 +89,7 @@ Derivar o slug da tensão cristalizada (kebab-case, 2-4 palavras). Salvar em `.c
 
 Exibir também na conversa.
 
-```
+```text
 # Clarify: [título derivado da tensão — 4-6 palavras]
 
 ## Sinal bruto
