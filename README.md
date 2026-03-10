@@ -1,5 +1,7 @@
 # claude-kickstart
 
+> **⚠️ Deprecated:** This template-fork model has been superseded by [claude-skills-v2](https://github.com/rmolines/claude-skills-v2) which uses a discovery-to-delivery workflow (`/discovery → /planning → /delivery → /review`) with global skill files instead of per-repo templates. Existing projects that used `make sync-skills` continue to work — no action needed. For new projects, use the v2 workflow.
+
 **The professional Claude Code setup you'd spend 3 months discovering on your own — working in 30 minutes.**
 
 Fork → open Claude Code → run `/start-project "your idea"` → 30 minutes later you have:
