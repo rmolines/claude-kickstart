@@ -345,7 +345,10 @@ Próximo comando: /start-feature <nome>
 
 ### Passo B.1 — Ler a pesquisa
 
-Ler `.claude/feature-plans/<nome>/research.md` integralmente.
+Localizar a seção `## Handoff` de `.claude/feature-plans/<nome>/research.md`.
+
+- **Se `## Handoff` existir:** ler apenas essa seção. Extrair `carry_forward`, `excluded` e `invalidated`.
+- **Se não existir:** ler o arquivo inteiro + emitir: `⚠️ research.md sem Handoff block — lendo arquivo completo como fallback`.
 
 ### Passo B.2 — Montar plano de execução
 
